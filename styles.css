@@ -8,7 +8,7 @@ body {
 
 /* ヘッダー */
 header {
-    background-color: #ff9100;
+    background-color: #ff6347;
     color: white;
     text-align: center;
     padding: 20px;
@@ -18,12 +18,47 @@ header h1 {
     margin: 0;
 }
 
+/* コンテナ */
+.container {
+    display: flex;
+    margin: 20px;
+}
+
+/* サイドバー */
+.sidebar {
+    width: 200px;
+    background-color: #fff;
+    padding: 20px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    margin-right: 20px;
+}
+
+.sidebar h3 {
+    color: #ff6347;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar ul li {
+    margin-bottom: 10px;
+}
+
+.sidebar ul li a {
+    text-decoration: none;
+    color: #333;
+    font-size: 1.1em;
+}
+
+.sidebar ul li a:hover {
+    color: #ff6347;
+}
+
 /* レシピセクション */
 .recipe {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-around;
-    margin: 20px;
+    flex: 1;
 }
 
 .recipe-image img {
