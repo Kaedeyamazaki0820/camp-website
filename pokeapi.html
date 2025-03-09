@@ -34,6 +34,11 @@
       padding: 0.5rem;
       margin: 0.3rem 0;
       border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    li:hover {
+      background: #d6d8db;
     }
   </style>
 </head>
@@ -54,48 +59,53 @@
   let pokemonName = document.getElementById('pokemonName');
   let pokemonImage = document.getElementById('pokemonImage');
   let evolutionList = document.getElementById('evolutionList');
-  let pokemonNumber = Math.floor(Math.random() * 898) + 1;
 
-  fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonNumber}`)
-    .then(response => response.json())
-    .then(data => {
-      pokemonImage.src = data.sprites.front_default;
-      return fetch(data.species.url);
-    })
-    .then(response => response.json())
-    .then(speciesData => {
-      let jpName = speciesData.names.find(name => name.language.name === "ja");
-      pokemonName.textContent = jpName ? jpName.name : "名前不明";
-      return fetch(speciesData.evolution_chain.url);
-    })
-    .then(response => response.json())
-    .then(evolutionData => {
-      evolutionList.innerHTML = "";
-      let evolutions = [];
-      let current = evolutionData.chain;
-      while (current) {
-        evolutions.push(current.species.name);
-        current = current.evolves_to.length > 0 ? current.evolves_to[0] : null;
-      }
-      
-      let promises = evolutions.map(name => 
-        fetch(`https://pokeapi.co/api/v2/pokemon-species/${name}`)
-          .then(response => response.json())
-          .then(species => {
-            let jpName = species.names.find(n => n.language.name === "ja");
-            return jpName ? jpName.name : name;
-          })
-      );
-      
-      Promise.all(promises).then(jpNames => {
-        jpNames.forEach(name => {
-          let li = document.createElement("li");
-          li.textContent = name;
-          evolutionList.appendChild(li);
+  function fetchPokemon(pokemonNumber) {
+    fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonNumber}`)
+      .then(response => response.json())
+      .then(data => {
+        pokemonImage.src = data.sprites.front_default;
+        return fetch(data.species.url);
+      })
+      .then(response => response.json())
+      .then(speciesData => {
+        let jpName = speciesData.names.find(name => name.language.name === "ja");
+        pokemonName.textContent = jpName ? jpName.name : "名前不明";
+        return fetch(speciesData.evolution_chain.url);
+      })
+      .then(response => response.json())
+      .then(evolutionData => {
+        evolutionList.innerHTML = "";
+        let evolutions = [];
+        let current = evolutionData.chain;
+        while (current) {
+          evolutions.push(current.species.name);
+          current = current.evolves_to.length > 0 ? current.evolves_to[0] : null;
+        }
+        
+        let promises = evolutions.map(name => 
+          fetch(`https://pokeapi.co/api/v2/pokemon-species/${name}`)
+            .then(response => response.json())
+            .then(species => {
+              let jpName = species.names.find(n => n.language.name === "ja");
+              return { name: jpName ? jpName.name : name, englishName: name };
+            })
+        );
+        
+        Promise.all(promises).then(jpNames => {
+          jpNames.forEach(pokemon => {
+            let li = document.createElement("li");
+            li.textContent = pokemon.name;
+            li.onclick = () => fetchPokemon(pokemon.englishName);
+            evolutionList.appendChild(li);
+          });
         });
-      });
-    })
-    .catch(error => console.error(`エラーが発生しました: ${error}`));
+      })
+      .catch(error => console.error(`エラーが発生しました: ${error}`));
+  }
+
+  let pokemonNumber = Math.floor(Math.random() * 898) + 1;
+  fetchPokemon(pokemonNumber);
 </script>
 
 </body>
