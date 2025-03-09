@@ -3,7 +3,8 @@
 <head>
   <title>Maple's Website</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css" >
-  <style>
+  
+ <style>
   </style>
 </head>
 <body>
@@ -11,13 +12,73 @@
     <h1>Maple's Website</h1>
     <p>これはめーぷるのウェブサイトです。</p>
     
+    <div>
+        <p>あなたは <span id="counter"></span>人目の訪問者です。</p>
+    </div>
+
     <ul>
       <li><a href="https://x.com/maple_yamazaki">X</a></li>
       <li><a href="https://kaedeyamazaki0820.github.io/camp-website/pokeapi.html" target="_blank">おすすめポケモン</a></li>
       <li><a href="https://kaedeyamazaki0820.github.io/camp-website/guessgame.html" target="_blank">数当てゲーム</a></li>
     </ul>
     
-    <img src="computer01_smile.png" alt="笑顔のコンピューター">
+    <div class="animation-area">
+        <img id="image" src="bird_fukurou_run.png" width="50" height="50" alt="site-logo">
+      </div>
+
   </main>
+
+
+  <script type="module">
+    const image = document.getElementById('image'); // ロゴ画像
+    
+    // 画像を左端から200px右に動かす
+    image.animate(
+    // 途中の状態を表す配列
+      [
+        { transform: 'translateX(0)'}, // 開始時の状態（左端）
+        { transform: 'translateX(200px)' } // 終了時の状態（左端から200pxの位置）
+      ], 
+      // タイミングに関する設定
+      {
+        fill: 'backwards', // 再生前後の状態（再生前、開始時の状態を適用）
+        duration: 10000, // 再生時間（1000ミリ秒）
+        iterations: Infinity,  // アニメーションの繰り返し回数（ずっと繰り返す）
+      },
+    );
+    
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
+        import { getFirestore, doc, runTransaction } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js";
+    
+        const firebaseConfig = {
+        apiKey: "AIzaSyActHxiG_yPL_kCzOql9XzqNIIM0NkEQiI",
+        authDomain: "counter-dd5ea.firebaseapp.com",
+        projectId: "counter-dd5ea",
+        storageBucket: "counter-dd5ea.firebasestorage.app",
+        messagingSenderId: "781403428403",
+        appId: "1:781403428403:web:e02e7a19c21d137fd6f546"
+      };
+    
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const counterDoc = doc(db, 'counters', 'access');
+    
+        // カウンターを増やして表示
+        const incrementCounter = async () => {
+          let newCount = 0;
+          await runTransaction(db, async (transaction) => {
+            const docSnap = await transaction.get(counterDoc);
+            newCount = (docSnap.exists() ? docSnap.data().count : 0) + 1;
+            transaction.set(counterDoc, { count: newCount });
+          });
+          document.getElementById('counter').textContent = newCount;
+        };
+    
+        // ページロード時にカウンターを増やして表示
+        incrementCounter();
+    </script>
 </body>
 </html>
+
