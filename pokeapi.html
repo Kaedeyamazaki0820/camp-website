@@ -21,12 +21,15 @@
   <div id="pokemon">
     <h2 id="pokemonName"></h2>
     <img id="pokemonImage" src="">
+    <h3>進化系</h3>
+    <ul id="evolutionList"></ul>
   </div>
 </main>
 
 <script>
   let pokemonName = document.getElementById('pokemonName');
   let pokemonImage = document.getElementById('pokemonImage');
+  let evolutionList = document.getElementById('evolutionList');
   let pokemonNumber = Math.floor(Math.random() * 898) + 1;
 
   fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonNumber}`)
@@ -39,6 +42,34 @@
     .then(speciesData => {
       let jpName = speciesData.names.find(name => name.language.name === "ja");
       pokemonName.textContent = jpName ? jpName.name : "名前不明";
+      return fetch(speciesData.evolution_chain.url);
+    })
+    .then(response => response.json())
+    .then(evolutionData => {
+      evolutionList.innerHTML = "";
+      let evolutions = [];
+      let current = evolutionData.chain;
+      while (current) {
+        evolutions.push(current.species.name);
+        current = current.evolves_to.length > 0 ? current.evolves_to[0] : null;
+      }
+      
+      let promises = evolutions.map(name => 
+        fetch(`https://pokeapi.co/api/v2/pokemon-species/${name}`)
+          .then(response => response.json())
+          .then(species => {
+            let jpName = species.names.find(n => n.language.name === "ja");
+            return jpName ? jpName.name : name;
+          })
+      );
+      
+      Promise.all(promises).then(jpNames => {
+        jpNames.forEach(name => {
+          let li = document.createElement("li");
+          li.textContent = name;
+          evolutionList.appendChild(li);
+        });
+      });
     })
     .catch(error => console.error(`エラーが発生しました: ${error}`));
 </script>
