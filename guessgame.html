@@ -24,6 +24,8 @@
     <input type="submit" value="予想を入力" id="guessSubmit">
     <p id="guessResult"></p>
   </div>
+
+  <a href="index.html" target="_blank">ホームに戻る</a>
 </main>
 
 <script>
@@ -31,8 +33,8 @@
   let answerNumber = Math.floor(Math.random() * 100) + 1;
   console.log('正解は' + answerNumber);
   
-// 予想回数（初期値は1）
-  let guessCount = 1; 
+// 予想回数（初期値は0）
+  let guessCount = 0; 
 
   // 数値入力フィールドを取得
   let guessField = document.querySelector('#guessField');
@@ -50,17 +52,9 @@
 
     if (userGuess === answerNumber) { // ユーザの入力が正解
       guessResult.textContent = '正解です！';
-
-    } else if(guessCount === 10) { // 予想回数が10回に達した場合
-      guessResult.textContent = '!!!ゲームオーバー!!!';
-      
-      setGameOver(); // ゲームオーバー時の処理を行う（後述）
-    
-    } else if{ // 入力した予想が間違っている、かつ予想回数が10回未満の場合
-
-     (userGuess < answerNumber) // ユーザの入力が正解より小さい
+    } else if (userGuess < answerNumber) { // ユーザの入力が正解より小さい
       guessResult.textContent = 'もっと大きいです';
-    } else  (userGuess > answerNumber) { // ユーザの入力が正解より大きい
+    } else if (userGuess > answerNumber) { // ユーザの入力が正解より大きい
       guessResult.textContent = 'もっと小さいです';
     }
     guessCount = guessCount + 1;
@@ -70,16 +64,9 @@
   // submitがクリックされたときに、checkGuess関数を呼び出す
   guessSubmit.addEventListener('click', checkGuess);
 
-  function setGameOver() { // ゲームオーバー時の処理を行う関数
-	  guessField.disabled = true; // 入力フォームを利用不可にする
-	  guessSubmit.disabled = true; // 予想を入力ボタンを利用不可にする
-	  resetButton = document.createElement('button'); // ボタン要素を生成してresetButtonに代入
-	  resetButton.textContent = '新しいゲームを始める'; // resetButtonのテキスト
-	  resetField.appendChild(resetButton); // リセットボタン用のフィールドにresetButtonを表示
-	  resetButton.addEventListener('click', resetGame); // resetButtonをクリックするとresetGame()関数が発火する
-  }
 
 </script>
 
 </body>
 </html>
+
